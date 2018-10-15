@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.event.monitor.db.EventCounterService;
-import com.example.util.dto.events.WMSEvent;
+import com.threedsoft.util.dto.events.WMSEvent;
 
 import lombok.extern.slf4j.Slf4j;
 

@@ -23,7 +23,7 @@ import com.example.event.monitor.service.MessagePublisher;
 import com.example.event.monitor.service.RedisMessagePublisher;
 import com.example.event.monitor.service.RedisMessageSubscriber;
 import com.example.event.monitor.streams.EventMonitorStreams;
-import com.example.util.service.EventPublisher;
+import com.threedsoft.util.service.EventPublisher;
 
 import lombok.extern.slf4j.Slf4j;
 

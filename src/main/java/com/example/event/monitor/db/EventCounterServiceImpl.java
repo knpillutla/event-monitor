@@ -10,7 +10,7 @@ import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import com.example.util.dto.events.WMSEvent;
+import com.threedsoft.util.dto.events.WMSEvent;
 
 import lombok.extern.slf4j.Slf4j;
 

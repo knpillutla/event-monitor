@@ -4,7 +4,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Repository;
 
-import com.example.util.dto.events.WMSEvent;
+import com.threedsoft.util.dto.events.WMSEvent;
 
 import lombok.extern.slf4j.Slf4j;
 

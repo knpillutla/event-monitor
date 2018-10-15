@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 import com.example.event.monitor.service.EventMonitorService;
 import com.example.event.monitor.streams.EventMonitorStreams;
-import com.example.util.dto.events.WMSEvent;
+import com.threedsoft.util.dto.events.WMSEvent;
 
 import lombok.extern.slf4j.Slf4j;
 
