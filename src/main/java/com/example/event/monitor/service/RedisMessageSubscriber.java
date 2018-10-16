@@ -33,7 +33,7 @@ public class RedisMessageSubscriber implements MessageListener {
 		// messageList.add(message.toString());
 		WMSEvent wmsEvent;
 		GenericJackson2JsonRedisSerializer deSerializer = new GenericJackson2JsonRedisSerializer();
-		wmsEvent = (WMSEvent) deSerializer.deserialize(message.getBody());
+		wmsEvent = (WMSEvent) deSerializer.deserialize(message.getBody(), WMSEvent.class);
 		log.info("Event received: " + wmsEvent);
 		if (eventCounterService == null) {
 			log.error("Event Counter Service is not initialized");
@@ -42,12 +42,5 @@ public class RedisMessageSubscriber implements MessageListener {
 			eventCounterService.addNewEvent(wmsEvent.getEventName());
 			log.info("Get EventCounters for current hour: " + eventCounterService.getCurrentHourEventCounters());
 		}
-	}
-
-	/* De serialize the byte array to object */
-	private static Object getObject(byte[] byteArr) throws IOException, ClassNotFoundException {
-		ByteArrayInputStream bis = new ByteArrayInputStream(byteArr);
-		ObjectInput in = new ObjectInputStream(bis);
-		return in.readObject();
 	}
 }

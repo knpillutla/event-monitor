@@ -16,14 +16,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class EventMonitorListener {
 	@Autowired
-	EventMonitorService studentService;
+	EventMonitorService eventMonitorService;
 
 /*	@StreamListener(target = OrderAggregatorStreams.ORDERS_OUTPUT)
 	public void handleNewOrder(Message msg) {
 		log.info("Received order Msg:" + msg.getPayload() + ": at :" + LocalDateTime.now());
 		long startTime = System.currentTimeMillis();
 		try {
-			studentService.add((BaseEvent)msg.getPayload());
+			eventMonitorService.add((BaseEvent)msg.getPayload());
 			long endTime = System.currentTimeMillis();
 			log.info("Completed order event for : " + msg.getPayload() + ": at :"
 					+ LocalDateTime.now() + " : total time:" + (endTime - startTime) / 1000.00 + " secs");
@@ -39,7 +39,7 @@ public class EventMonitorListener {
 		log.info("Received order Msg:" + event + ": at :" + LocalDateTime.now());
 		long startTime = System.currentTimeMillis();
 		try {
-			studentService.add(event);
+			eventMonitorService.add(event);
 			long endTime = System.currentTimeMillis();
 			log.info("Completed order event for : " + event + ": at :"
 					+ LocalDateTime.now() + " : total time:" + (endTime - startTime) / 1000.00 + " secs");
@@ -56,7 +56,7 @@ public class EventMonitorListener {
 		log.info("Received inventory Msg:" + event + ": at :" + LocalDateTime.now());
 		long startTime = System.currentTimeMillis();
 		try {
-			studentService.add(event);
+			eventMonitorService.add(event);
 			long endTime = System.currentTimeMillis();
 			log.info("Completed inventory event for : " + event + ": at :"
 					+ LocalDateTime.now() + " : total time:" + (endTime - startTime) / 1000.00 + " secs");
@@ -73,7 +73,7 @@ public class EventMonitorListener {
 		log.info("Received pick Msg:" + event + ": at :" + LocalDateTime.now());
 		long startTime = System.currentTimeMillis();
 		try {
-			studentService.add(event);
+			eventMonitorService.add(event);
 			long endTime = System.currentTimeMillis();
 			log.info("Completed pick event for : " + event + ": at :"
 					+ LocalDateTime.now() + " : total time:" + (endTime - startTime) / 1000.00 + " secs");
@@ -90,7 +90,7 @@ public class EventMonitorListener {
 		log.info("Received pack Msg:" + event + ": at :" + LocalDateTime.now());
 		long startTime = System.currentTimeMillis();
 		try {
-			studentService.add(event);
+			eventMonitorService.add(event);
 			long endTime = System.currentTimeMillis();
 			log.info("Completed pack event for : " + event + ": at :"
 					+ LocalDateTime.now() + " : total time:" + (endTime - startTime) / 1000.00 + " secs");
@@ -106,7 +106,7 @@ public class EventMonitorListener {
 		log.info("Received ship Msg:" + event + ": at :" + LocalDateTime.now());
 		long startTime = System.currentTimeMillis();
 		try {
-			studentService.add(event);
+			eventMonitorService.add(event);
 			long endTime = System.currentTimeMillis();
 			log.info("Completed ship event for : " + event + ": at :"
 					+ LocalDateTime.now() + " : total time:" + (endTime - startTime) / 1000.00 + " secs");

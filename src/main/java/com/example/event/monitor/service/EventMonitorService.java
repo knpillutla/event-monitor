@@ -21,9 +21,6 @@ public class EventMonitorService {
 	EventCounterService eventCounterService;
 
 	public void add(WMSEvent wmsEvent) {
-		if(wmsEvent.getServiceName() == null) {
-			wmsEvent.setServiceName("EventMonitor-Tmp");
-		}
 		log.info("Received msg and publishing to redis channel:" + wmsEvent.getEventName());
 		redisMessagePublisher.publish(wmsEvent);
 		log.info("published to redis channel:" + wmsEvent.getEventName());
