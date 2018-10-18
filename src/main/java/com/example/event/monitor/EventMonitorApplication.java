@@ -1,6 +1,7 @@
 package com.example.event.monitor;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -36,24 +37,24 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class EventMonitorApplication {
 	@Autowired
-	EventMonitorStreams orderStreams;
+	EventMonitorStreams eventMonitorStreams;
 
+    @Value("${redis.host}")
+	private String redisHost;
+    @Value("${redis.port}")
+	private Integer redisPort;
+	
 	public static void main(String[] args) {
 		SpringApplication.run(EventMonitorApplication.class, args);
 	}
 
 	@Bean
-	public EventPublisher eventPublisher() {
-		return new EventPublisher(orderStreams.outboundOrders());
-	}
-
-	@Bean
 	JedisConnectionFactory jedisConnectionFactory() {
-//		JedisConnectionFactory jedisConFactory = new JedisConnectionFactory();
-//		jedisConFactory.setHostName("localhost");
-//		jedisConFactory.setPort(6379);
-//		return jedisConFactory;
-		return new JedisConnectionFactory();
+		JedisConnectionFactory jedisConFactory = new JedisConnectionFactory();
+		jedisConFactory.setHostName(redisHost);
+		jedisConFactory.setPort(redisPort);
+		return jedisConFactory;
+		//return new JedisConnectionFactory();
 	}
 
 	@Bean
