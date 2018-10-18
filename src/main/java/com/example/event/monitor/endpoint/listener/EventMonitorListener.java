@@ -34,6 +34,23 @@ public class EventMonitorListener {
 					+ LocalDateTime.now() + " : total time:" + (endTime - startTime) / 1000.00 + " secs", e);
 		}
 	}*/
+	@StreamListener(target = EventMonitorStreams.CUSTOMER_ORDERS_OUTPUT)
+	public void handleCustomerOrderEvents(WMSEvent event) {
+		log.info("Received order Msg:" + event + ": at :" + LocalDateTime.now());
+		long startTime = System.currentTimeMillis();
+		try {
+			eventMonitorService.add(event);
+			long endTime = System.currentTimeMillis();
+			log.info("Completed order event for : " + event + ": at :"
+					+ LocalDateTime.now() + " : total time:" + (endTime - startTime) / 1000.00 + " secs");
+		} catch (Exception e) {
+			e.printStackTrace();
+			long endTime = System.currentTimeMillis();
+			log.error("Error Completing order event for : " + event + ": at :"
+					+ LocalDateTime.now() + " : total time:" + (endTime - startTime) / 1000.00 + " secs", e);
+		}
+	}
+
 	@StreamListener(target = EventMonitorStreams.ORDERS_OUTPUT)
 	public void handleOrderEvents(WMSEvent event) {
 		log.info("Received order Msg:" + event + ": at :" + LocalDateTime.now());

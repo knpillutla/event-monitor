@@ -12,6 +12,7 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.stereotype.Service;
 
 import com.example.event.monitor.db.EventCounterService;
+import com.threedsoft.util.dto.events.EventResourceConverter;
 import com.threedsoft.util.dto.events.WMSEvent;
 
 import lombok.extern.slf4j.Slf4j;
@@ -32,8 +33,9 @@ public class RedisMessageSubscriber implements MessageListener {
 	public void onMessage(Message message, byte[] pattern) {
 		// messageList.add(message.toString());
 		WMSEvent wmsEvent;
-		GenericJackson2JsonRedisSerializer deSerializer = new GenericJackson2JsonRedisSerializer();
-		wmsEvent = (WMSEvent) deSerializer.deserialize(message.getBody(), WMSEvent.class);
+		//GenericJackson2JsonRedisSerializer deSerializer = new GenericJackson2JsonRedisSerializer();
+		//wmsEvent = (WMSEvent) deSerializer.deserialize(message.getBody(), WMSEvent.class);
+		wmsEvent = (WMSEvent)EventResourceConverter.getObject(message.getBody(), WMSEvent.class);
 		log.info("Event received: " + wmsEvent);
 		if (eventCounterService == null) {
 			log.error("Event Counter Service is not initialized");
