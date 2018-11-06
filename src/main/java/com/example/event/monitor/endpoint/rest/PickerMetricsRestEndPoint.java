@@ -1,6 +1,5 @@
 package com.example.event.monitor.endpoint.rest;
 
-import java.io.IOException;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,12 +26,15 @@ import lombok.extern.slf4j.Slf4j;
 @Api(value = "Event Monitor Service", description = "Operations pertaining to Monitoring of Events")
 @RefreshScope
 @Slf4j
-public class EventMonitorRestEndPoint {
+public class PickerMetricsRestEndPoint {
 	@Autowired
 	EventMonitorService eventMonitorService;
 
 	@Autowired
 	OrderEventCounterService orderCounterService;
+
+	@Autowired
+	PickEventCounterService pickCounterService;
 
 	@Value("${wms.service.health.msg: Event Monitor Service - Config Server is not working..please check}")
 	private String healthMsg;
@@ -40,84 +42,80 @@ public class EventMonitorRestEndPoint {
 	@Value("${wms.service.ready.msg: Event Monitor Service - Not ready yet}")
 	private String readyMsg;
 
-	@GetMapping("/ready")
-	public ResponseEntity ready() throws Exception {
-		return ResponseEntity.ok(readyMsg);
-	}
-
-	@GetMapping("/health")
-	public ResponseEntity health() throws Exception {
-		return ResponseEntity.ok(healthMsg);
-	}
-
-	@GetMapping("/{busName}/{locnNbr}/eventcounters/{numOfDays}")
-	public ResponseEntity getById(@PathVariable("busName") String busName, @PathVariable("locnNbr") Integer locnNbr,
-			@PathVariable("numOfDays") Integer numOfDays) throws IOException {
-		try {
-			return ResponseEntity.ok(eventMonitorService.getEventCounters(busName, locnNbr, numOfDays));
-		} catch (Exception e) {
-			log.error("Error Occured for busName:" + busName + ", locnNbr:" + locnNbr + " : " + e.getMessage());
-			return ResponseEntity.badRequest()
-					.body(new ErrorResourceDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(),
-							"Error Occured while getting event counters for busName:" + busName + ", locnNbr:" + locnNbr
-									+ " : " + e.getMessage()));
-		}
-	}
-
-	@GetMapping("/{busName}/{locnNbr}/orders/backlog")
-	public ResponseEntity getOrderCounter(@PathVariable("busName") String busName,
+	@GetMapping("/{busName}/{locnNbr}/picks/counter")
+	public ResponseEntity getPickCounter(@PathVariable("busName") String busName,
 			@PathVariable("locnNbr") Integer locnNbr) throws Exception {
 		try {
-			log.info("Received request for order counter:" + busName + ":" + locnNbr);
-			CounterStat pickHeatMap = orderCounterService.getOrderCounts(busName, locnNbr);
-			log.info("Completed request for order counter:" + busName + ":" + locnNbr + ":" + pickHeatMap);
+			log.info("Received request for pick counter:" + busName + ":" + locnNbr);
+			CounterStat pickHeatMap = pickCounterService.getPickCounts(busName, locnNbr);
+			log.info("Completed request for pick counter:" + busName + ":" + locnNbr + ":" + pickHeatMap);
 			return ResponseEntity.ok(pickHeatMap);
 		} catch (Exception e) {
-			log.error("Error Occured for order counter busName:" + busName + ", locnNbr:" + locnNbr + " : "
+			log.error("Error Occured for pick counter busName:" + busName + ", locnNbr:" + locnNbr + " : "
 					+ e.getMessage());
 			return ResponseEntity.badRequest()
 					.body(new ErrorResourceDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(),
-							"Error Occured while getting order counter for busName:" + busName + ", locnNbr:" + locnNbr
+							"Error Occured while getting pick counter for busName:" + busName + ", locnNbr:" + locnNbr
 									+ " : " + e.getMessage()));
 		}
 	}
 
-	@GetMapping("/{busName}/{locnNbr}/orders/stats/{numOfDays}")
-	public ResponseEntity getHourlyOrderStatistics(@PathVariable("busName") String busName,
-			@PathVariable("locnNbr") Integer locnNbr, @PathVariable("numOfDays") Integer numOfDays) throws Exception {
-		try {
-			log.info("Received request for order counter:" + busName + ":" + locnNbr);
-			Map<String, Map<String, Long>> pickHeatMap = orderCounterService.getOrderHourlyStats(busName, locnNbr,
-					numOfDays);
-			log.info("Completed request for order counter:" + busName + ":" + locnNbr + ":" + pickHeatMap);
-			return ResponseEntity.ok(pickHeatMap);
-		} catch (Exception e) {
-			log.error("Error Occured for order counter busName:" + busName + ", locnNbr:" + locnNbr + " : "
-					+ e.getMessage());
-			return ResponseEntity.badRequest()
-					.body(new ErrorResourceDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(),
-							"Error Occured while getting order counter for busName:" + busName + ", locnNbr:" + locnNbr
-									+ " : " + e.getMessage()));
-		}
-	}
-
-	@GetMapping("/{busName}/{locnNbr}/orders/picking/stats/{numOfDays}/{numOfTopPerformers}")
-	public ResponseEntity getPickingStats(@PathVariable("busName") String busName,
+	@GetMapping("/{busName}/{locnNbr}/picks/picker/stats/{numOfDays}/{numOfTopPerformers}")
+	public ResponseEntity getTopPickersForPast24Hours(@PathVariable("busName") String busName,
 			@PathVariable("locnNbr") Integer locnNbr, @PathVariable("numOfDays") Integer numOfDays,
 			@PathVariable("numOfTopPerformers") Integer numOfTopPerformers) throws Exception {
 		try {
-			log.info("Received request for getPickingStats:" + busName + ":" + locnNbr);
-			Map<String, Map<String, Object>> pickHeatMap = orderCounterService.getPickingStats(busName, locnNbr, numOfDays, numOfTopPerformers);
-			log.info("Completed request for getPickingStats:" + busName + ":" + locnNbr + ":" + pickHeatMap);
+			log.info("Received request for order counter:" + busName + ":" + locnNbr);
+			Map<String, Map<String, Long>> pickHeatMap = orderCounterService
+					.getTopPickPerformersByHourForPast24Hours(busName, locnNbr, numOfDays, numOfTopPerformers);
+			log.info("Completed request for order counter:" + busName + ":" + locnNbr + ":" + pickHeatMap);
 			return ResponseEntity.ok(pickHeatMap);
 		} catch (Exception e) {
-			log.error("Error Occured forgetPickingStats busName:" + busName + ", locnNbr:" + locnNbr + " : "
+			log.error("Error Occured for order counter busName:" + busName + ", locnNbr:" + locnNbr + " : "
 					+ e.getMessage());
 			return ResponseEntity.badRequest()
 					.body(new ErrorResourceDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(),
-							"Error Occured while getting getPickingStats for busName:" + busName + ", locnNbr:" + locnNbr
+							"Error Occured while getting order counter for busName:" + busName + ", locnNbr:" + locnNbr
 									+ " : " + e.getMessage()));
 		}
 	}
 
+/*	@GetMapping("/{busName}/{locnNbr}/picks/picker/stats/{numOfDays}/{numOfTopPerformers}")
+	public ResponseEntity getTopPickersForPast24Hours(@PathVariable("busName") String busName,
+			@PathVariable("locnNbr") Integer locnNbr, @PathVariable("numOfDays") Integer numOfDays,
+			@PathVariable("numOfTopPerformers") Integer numOfTopPerformers) throws Exception {
+		try {
+			log.info("Received request for order counter:" + busName + ":" + locnNbr);
+			Map<String, Map<String, Long>> pickHeatMap = orderCounterService
+					.getTopPickPerformersByHourForPast24Hours(busName, locnNbr, numOfDays, numOfTopPerformers);
+			log.info("Completed request for order counter:" + busName + ":" + locnNbr + ":" + pickHeatMap);
+			return ResponseEntity.ok(pickHeatMap);
+		} catch (Exception e) {
+			log.error("Error Occured for order counter busName:" + busName + ", locnNbr:" + locnNbr + " : "
+					+ e.getMessage());
+			return ResponseEntity.badRequest()
+					.body(new ErrorResourceDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(),
+							"Error Occured while getting order counter for busName:" + busName + ", locnNbr:" + locnNbr
+									+ " : " + e.getMessage()));
+		}
+	}
+*/
+	@GetMapping("/{busName}/{locnNbr}/picks/picker/stats")
+	public ResponseEntity getTopPickersForCurrentHour(@PathVariable("busName") String busName,
+			@PathVariable("locnNbr") Integer locnNbr) throws Exception {
+		try {
+			log.info("Received request for order counter:" + busName + ":" + locnNbr);
+			Map<String, Map<String, Long>> pickHeatMap = orderCounterService.getTopPickPerformersForCurrentHour(busName,
+					locnNbr);
+			log.info("Completed request for order counter:" + busName + ":" + locnNbr + ":" + pickHeatMap);
+			return ResponseEntity.ok(pickHeatMap);
+		} catch (Exception e) {
+			log.error("Error Occured for order counter busName:" + busName + ", locnNbr:" + locnNbr + " : "
+					+ e.getMessage());
+			return ResponseEntity.badRequest()
+					.body(new ErrorResourceDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(),
+							"Error Occured while getting order counter for busName:" + busName + ", locnNbr:" + locnNbr
+									+ " : " + e.getMessage()));
+		}
+	}
 }

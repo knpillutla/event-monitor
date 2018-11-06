@@ -1,8 +1,8 @@
 package com.example.event.monitor.db;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +11,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.threedsoft.util.dto.events.WMSEvent;
+import com.threedsoft.util.util.DateTimeUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,7 +37,7 @@ public class EventCounterServiceImpl implements EventCounterService{
 	}
 	
 	public void updateEventCount(String eventName) {
-		String hourKey = getFormattedStringForHour(LocalDateTime.now());
+		String hourKey = DateTimeUtil.getFormattedStringForCurrentHour();
 		Long eventCount = redisHashOps.get(hourKey, eventName);
 		Long incrementVal = 1L;
 		if (eventCount == null) {
@@ -52,7 +53,7 @@ public class EventCounterServiceImpl implements EventCounterService{
 	@Override
 	public Map<String, Map<String, Long>> getCurrentHourEventCounters() {
 		Map<String, Map<String, Long>> currentHourCounters = new HashMap();
-		String hourKey = getFormattedStringForHour(LocalDateTime.now());
+		String hourKey = DateTimeUtil.getFormattedStringForCurrentHour();
 		Map<String, Long> hourMap = redisHashOps.entries(hourKey);
 		currentHourCounters.put(hourKey, hourMap);
 		return currentHourCounters;
@@ -61,24 +62,15 @@ public class EventCounterServiceImpl implements EventCounterService{
 	@Override
 	public Map<String, Map<String, Long>> getEventCounters(int numOfDays) {
 		Map<String, Map<String, Long>> eventCounters = new HashMap();
-		// get data for last 3 days
-		LocalDateTime now = LocalDateTime.now();
-		LocalDateTime monitorStartDateTime = now.minusDays(numOfDays);
-		int numOfCounterHours = numOfDays*24;
 		Map<String, Long> hourMap;
-		for(int i=0;i<numOfCounterHours;i++) {
-			LocalDateTime counterDateTime = monitorStartDateTime.plusHours(i);
-			String hourKey = getFormattedStringForHour(counterDateTime);
-			hourMap = redisHashOps.entries(hourKey);
-			eventCounters.put(hourKey, hourMap);
+		List<String> formattedHourList = DateTimeUtil.getFormattedHourListFromDate(numOfDays);
+		for(String formattedHour : formattedHourList) {
+			hourMap = redisHashOps.entries(formattedHour);
+			eventCounters.put(formattedHour, hourMap);
 		}
 		return eventCounters;
 	}
 	
-	private String getFormattedStringForHour(LocalDateTime dateTime) {
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:00:00");
-		return dateTime.format(formatter);
-	}
 
 	@Override
 	public void addNewEvent(WMSEvent event) {

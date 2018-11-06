@@ -17,14 +17,20 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.GenericToStringSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 import com.example.event.monitor.db.EventCounterService;
 import com.example.event.monitor.db.EventCounterServiceImpl;
+import com.example.event.monitor.db.OrderEventCounterService;
+import com.example.event.monitor.db.OrderEventCounterServiceImpl;
+import com.example.event.monitor.db.PickEventCounterService;
+import com.example.event.monitor.db.PickEventCounterServiceImpl;
 import com.example.event.monitor.service.MessagePublisher;
 import com.example.event.monitor.service.RedisMessagePublisher;
 import com.example.event.monitor.service.RedisMessageSubscriber;
 import com.example.event.monitor.streams.EventMonitorStreams;
-import com.threedsoft.util.service.EventPublisher;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,11 +45,11 @@ public class EventMonitorApplication {
 	@Autowired
 	EventMonitorStreams eventMonitorStreams;
 
-    @Value("${redis.host}")
+	@Value("${redis.host}")
 	private String redisHost;
-    @Value("${redis.port}")
+	@Value("${redis.port}")
 	private Integer redisPort;
-	
+
 	public static void main(String[] args) {
 		SpringApplication.run(EventMonitorApplication.class, args);
 	}
@@ -54,49 +60,79 @@ public class EventMonitorApplication {
 		jedisConFactory.setHostName(redisHost);
 		jedisConFactory.setPort(redisPort);
 		return jedisConFactory;
-		//return new JedisConnectionFactory();
+		// return new JedisConnectionFactory();
 	}
 
 	@Bean
 	public RedisTemplate<String, Object> redisTemplate() {
 		RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
 		redisTemplate.setConnectionFactory(jedisConnectionFactory());
-        //redisTemplate.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
+		// redisTemplate.setHashValueSerializer(new
+		// GenericJackson2JsonRedisSerializer());
+		redisTemplate.setKeySerializer(new StringRedisSerializer());
+		redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+		// redisTemplate.setValueSerializer(new
+		// GenericToStringSerializer<Long>(Long.class));
+		redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+		// redisTemplate.setHashValueSerializer(new
+		// StringRedisSerializer(StandardCharsets.UTF_8));
 		redisTemplate.setHashValueSerializer(new GenericToStringSerializer<Long>(Long.class));
-        redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
-       // redisTemplate.setValueSerializer(new GenericToStringSerializer<Long>(Long.class));
-        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
-        redisTemplate.afterPropertiesSet();
+		redisTemplate.afterPropertiesSet();
 		return redisTemplate;
-	}
-	
-	@Bean
-	EventCounterService eventCounterService() { 
-	    return new EventCounterServiceImpl(redisTemplate());
 	}
 
 	@Bean
-	MessageListenerAdapter messageListener() { 
-	    return new MessageListenerAdapter(new RedisMessageSubscriber(eventCounterService()));
+	EventCounterService eventCounterService() {
+		return new EventCounterServiceImpl(redisTemplate());
 	}
-	
+
+	@Bean
+	OrderEventCounterService orderEventCounterService() {
+		return new OrderEventCounterServiceImpl(redisTemplate());
+	}
+
+	@Bean
+	PickEventCounterService pickEventCounterService() {
+		return new PickEventCounterServiceImpl(redisTemplate());
+	}
+
+	@Bean
+	MessageListenerAdapter messageListener() {
+		return new MessageListenerAdapter(new RedisMessageSubscriber(eventCounterService(), pickEventCounterService(),
+				orderEventCounterService()));
+	}
+
 	@Bean
 	RedisMessageListenerContainer redisContainer() {
-	    RedisMessageListenerContainer container 
-	      = new RedisMessageListenerContainer(); 
-	    container.setConnectionFactory(jedisConnectionFactory()); 
-	    container.addMessageListener(messageListener(), topic()); 
-	    return container; 
+		RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+		container.setConnectionFactory(jedisConnectionFactory());
+		container.addMessageListener(messageListener(), topic());
+		return container;
 	}
-	
+
 	@Bean
-	MessagePublisher redisPublisher() { 
-	    return new RedisMessagePublisher(redisTemplate(), topic());
+	MessagePublisher redisPublisher() {
+		return new RedisMessagePublisher(redisTemplate(), topic());
 	}
-	
+
 	@Bean
 	ChannelTopic topic() {
-	    return new ChannelTopic("messageQueue");
-	}	
+		return new ChannelTopic("messageQueue");
+	}
+
+	@Bean
+	public CorsFilter corsFilter() {
+
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		CorsConfiguration config = new CorsConfiguration();
+		config.setAllowCredentials(true);
+		config.addAllowedOrigin("http://*the3dsoft.com");
+		config.addAllowedOrigin("http://localhost");
+		config.addAllowedOrigin("https://localhost:5000");
+		config.addAllowedHeader("*");
+		config.addAllowedMethod("*");
+		source.registerCorsConfiguration("/**", config);
+		return new CorsFilter(source);
+	}
+
 }
