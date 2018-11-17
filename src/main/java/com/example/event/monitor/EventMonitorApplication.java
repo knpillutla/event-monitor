@@ -1,35 +1,19 @@
 package com.example.event.monitor;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.context.annotation.Bean;
-import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.listener.ChannelTopic;
-import org.springframework.data.redis.listener.RedisMessageListenerContainer;
-import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
-import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
-import org.springframework.data.redis.serializer.GenericToStringSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
-import com.example.event.monitor.db.EventCounterService;
-import com.example.event.monitor.db.EventCounterServiceImpl;
-import com.example.event.monitor.db.OrderEventCounterService;
-import com.example.event.monitor.db.OrderEventCounterServiceImpl;
-import com.example.event.monitor.db.PickEventCounterService;
-import com.example.event.monitor.db.PickEventCounterServiceImpl;
-import com.example.event.monitor.service.MessagePublisher;
-import com.example.event.monitor.service.RedisMessagePublisher;
-import com.example.event.monitor.service.RedisMessageSubscriber;
 import com.example.event.monitor.streams.EventMonitorStreams;
 
 import lombok.extern.slf4j.Slf4j;
@@ -38,23 +22,25 @@ import lombok.extern.slf4j.Slf4j;
 @EnableBinding(EventMonitorStreams.class)
 @EnableAutoConfiguration
 @EnableScheduling
-//@EnableMongoAuditing
-@EnableRedisRepositories
+@EnableJpaAuditing
+@EntityScan(
+        basePackageClasses = {EventMonitorApplication.class, Jsr310JpaConverters.class}
+)
 @Slf4j
 public class EventMonitorApplication {
 	@Autowired
 	EventMonitorStreams eventMonitorStreams;
 
-	@Value("${redis.host}")
+/*	@Value("${redis.host}")
 	private String redisHost;
 	@Value("${redis.port}")
 	private Integer redisPort;
-
+*/
 	public static void main(String[] args) {
 		SpringApplication.run(EventMonitorApplication.class, args);
 	}
 
-	@Bean
+/*	@Bean
 	JedisConnectionFactory jedisConnectionFactory() {
 		JedisConnectionFactory jedisConFactory = new JedisConnectionFactory();
 		jedisConFactory.setHostName(redisHost);
@@ -120,7 +106,7 @@ public class EventMonitorApplication {
 		return new ChannelTopic("messageQueue");
 	}
 
-	@Bean
+*/	@Bean
 	public CorsFilter corsFilter() {
 	    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 	    CorsConfiguration config = new CorsConfiguration();

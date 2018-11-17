@@ -1,7 +1,6 @@
 package com.example.event.monitor.endpoint.rest;
 
 import java.io.IOException;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,9 +12,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.example.event.monitor.db.CounterStat;
-import com.example.event.monitor.db.OrderEventCounterService;
-import com.example.event.monitor.db.PickEventCounterService;
 import com.example.event.monitor.service.EventMonitorService;
 import com.threedsoft.util.dto.ErrorResourceDTO;
 
@@ -30,10 +26,10 @@ import lombok.extern.slf4j.Slf4j;
 public class EventMonitorRestEndPoint {
 	@Autowired
 	EventMonitorService eventMonitorService;
-
+/*
 	@Autowired
 	OrderEventCounterService orderCounterService;
-
+*/
 	@Value("${wms.service.health.msg: Event Monitor Service - Config Server is not working..please check}")
 	private String healthMsg;
 
@@ -50,7 +46,7 @@ public class EventMonitorRestEndPoint {
 		return ResponseEntity.ok(healthMsg);
 	}
 
-	@GetMapping("/{busName}/{locnNbr}/eventcounters/{numOfDays}")
+/*	@GetMapping("/{busName}/{locnNbr}/eventcounters/{numOfDays}")
 	public ResponseEntity getById(@PathVariable("busName") String busName, @PathVariable("locnNbr") Integer locnNbr,
 			@PathVariable("numOfDays") Integer numOfDays) throws IOException {
 		try {
@@ -62,16 +58,16 @@ public class EventMonitorRestEndPoint {
 							"Error Occured while getting event counters for busName:" + busName + ", locnNbr:" + locnNbr
 									+ " : " + e.getMessage()));
 		}
-	}
+	}*/
 
-	@GetMapping("/{busName}/{locnNbr}/orders/backlog")
+/*	@GetMapping("/{busName}/{locnNbr}/orders/backlog")
 	public ResponseEntity getOrderCounter(@PathVariable("busName") String busName,
 			@PathVariable("locnNbr") Integer locnNbr) throws Exception {
 		try {
 			log.info("Received request for order counter:" + busName + ":" + locnNbr);
-			CounterStat pickHeatMap = orderCounterService.getOrderCounts(busName, locnNbr);
-			log.info("Completed request for order counter:" + busName + ":" + locnNbr + ":" + pickHeatMap);
-			return ResponseEntity.ok(pickHeatMap);
+			//CounterStat pickHeatMap = orderCounterService.getOrderCounts(busName, locnNbr);
+			//log.info("Completed request for order counter:" + busName + ":" + locnNbr + ":" + pickHeatMap);
+			//return ResponseEntity.ok(pickHeatMap);
 		} catch (Exception e) {
 			log.error("Error Occured for order counter busName:" + busName + ", locnNbr:" + locnNbr + " : "
 					+ e.getMessage());
@@ -81,8 +77,8 @@ public class EventMonitorRestEndPoint {
 									+ " : " + e.getMessage()));
 		}
 	}
-
-	@GetMapping("/{busName}/{locnNbr}/orders/stats/{numOfDays}")
+*/
+	/*@GetMapping("/{busName}/{locnNbr}/orders/stats/{numOfDays}")
 	public ResponseEntity getHourlyOrderStatistics(@PathVariable("busName") String busName,
 			@PathVariable("locnNbr") Integer locnNbr, @PathVariable("numOfDays") Integer numOfDays) throws Exception {
 		try {
@@ -99,9 +95,9 @@ public class EventMonitorRestEndPoint {
 							"Error Occured while getting order counter for busName:" + busName + ", locnNbr:" + locnNbr
 									+ " : " + e.getMessage()));
 		}
-	}
+	}*/
 
-	@GetMapping("/{busName}/{locnNbr}/orders/picking/stats/{numOfDays}/{numOfTopPerformers}")
+/*	@GetMapping("/{busName}/{locnNbr}/orders/picking/stats/{numOfDays}/{numOfTopPerformers}")
 	public ResponseEntity getPickingStats(@PathVariable("busName") String busName,
 			@PathVariable("locnNbr") Integer locnNbr, @PathVariable("numOfDays") Integer numOfDays,
 			@PathVariable("numOfTopPerformers") Integer numOfTopPerformers) throws Exception {
@@ -118,6 +114,6 @@ public class EventMonitorRestEndPoint {
 							"Error Occured while getting getPickingStats for busName:" + busName + ", locnNbr:" + locnNbr
 									+ " : " + e.getMessage()));
 		}
-	}
+	}*/
 
 }

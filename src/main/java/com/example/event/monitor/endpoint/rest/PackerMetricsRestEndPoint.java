@@ -1,21 +1,8 @@
 package com.example.event.monitor.endpoint.rest;
 
-import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import com.example.event.monitor.db.OrderEventCounterService;
-import com.example.event.monitor.db.PickEventCounterService;
-import com.example.event.monitor.service.EventMonitorService;
-import com.threedsoft.util.dto.ErrorResourceDTO;
 
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 @RefreshScope
 @Slf4j
 public class PackerMetricsRestEndPoint {
-	@Autowired
+/*	@Autowired
 	EventMonitorService eventMonitorService;
 
 	@Autowired
@@ -76,4 +63,4 @@ public class PackerMetricsRestEndPoint {
 									+ " : " + e.getMessage()));
 		}
 	}
-}
+*/}
