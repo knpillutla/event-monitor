@@ -1,11 +1,16 @@
 package com.example.event.monitor.service;
 
+import java.util.List;
+import java.util.Map;
+
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import com.example.event.monitor.db.AppEventRepository;
+import com.threedsoft.packing.dto.responses.PackResourceDTO;
+import com.threedsoft.picking.dto.responses.PickResourceDTO;
 import com.threedsoft.util.dto.events.WMSEvent;
 
 import lombok.extern.slf4j.Slf4j;
@@ -15,31 +20,30 @@ import lombok.extern.slf4j.Slf4j;
 public class EventMonitorService {
 
 	@Autowired
-	private JdbcTemplate jdbcTemplate;
-	/*
-	 * @Autowired EventCounterService eventCounterService;
-	 */
+	AppEventRepository appEventRepository;
+
 	@Transactional
 	public void add(WMSEvent wmsEvent) {
-		/*
-		 * log.info("Received msg and publishing to redis channel:" +
-		 * wmsEvent.getEventName()); redisMessagePublisher.publish(wmsEvent);
-		 * log.info("published to redis channel:" + wmsEvent.getEventName());
-		 */
 		log.info("Received msg for event:" + wmsEvent.getEventName());
-/*		eventRepository.addEvent(wmsEvent.getBusName(), wmsEvent.getLocnNbr(), wmsEvent.getCompany(), wmsEvent.getDivision(),
-				wmsEvent.getBusUnit(), wmsEvent.getEventName(), wmsEvent.getCreatedDttm());
-*/		
-		
-		String insertsql = "insert into app_events (bus_name, locn_nbr, company, division, bus_unit, event_name,"
-				+ "created_dttm, updated_dttm) VALUES (?,?,?,?,?,?,?,?)";
-		jdbcTemplate.update(insertsql, wmsEvent.getBusName(), wmsEvent.getLocnNbr(), wmsEvent.getCompany(),wmsEvent.getDivision(),wmsEvent.getBusUnit(),wmsEvent.getEventName(),wmsEvent.getCreatedDttm(),wmsEvent.getCreatedDttm());
+		String userId = "";
+		if(wmsEvent.getEventName().equalsIgnoreCase("PickConfirmationEvent")) {
+			PickResourceDTO pickConfirmDTO = (PickResourceDTO)wmsEvent.getEventResource();
+			userId = pickConfirmDTO.getUserId();
+		}
+		else
+		if(wmsEvent.getEventName().equalsIgnoreCase("PackConfirmationEvent")) {
+			PackResourceDTO packConfirmDTO = (PackResourceDTO)wmsEvent.getEventResource();
+			userId = packConfirmDTO.getUserId();
+		}
+		appEventRepository.insertAppEvent(wmsEvent.getBusName(), wmsEvent.getLocnNbr(), wmsEvent.getCompany(),
+				wmsEvent.getDivision(), wmsEvent.getBusUnit(), wmsEvent.getEventName(), wmsEvent.getCreatedDttm(),
+				wmsEvent.getCreatedDttm(), userId);
 		log.info("processed msg for event:" + wmsEvent.getEventName());
 
 	}
-	/*
-	 * public Map<String,Map<String, Long>> getEventCounters(String busName, Integer
-	 * locnNbr, Integer numOfDays) { return
-	 * eventCounterService.getEventCounters(numOfDays); }
-	 */
+
+	public List<Map<String, Object>> getEventCounters(String busName, Integer locnNbr, Integer numOfDays) {
+		return appEventRepository.getEventCountsHourlyFromDays(busName, locnNbr, numOfDays);
+	}
+
 }
