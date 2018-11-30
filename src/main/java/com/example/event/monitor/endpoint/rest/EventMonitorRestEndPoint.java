@@ -19,7 +19,7 @@ import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 
 @Controller
-@RequestMapping("/eventmonitor/v1")
+@RequestMapping("/api/v1/eventmonitors/events")
 @Api(value = "Event Monitor Service", description = "Operations pertaining to Monitoring of Events")
 @RefreshScope
 @Slf4j
@@ -49,7 +49,7 @@ public class EventMonitorRestEndPoint {
 		return ResponseEntity.ok(healthMsg);
 	}
 
-	@GetMapping("/{busName}/{locnNbr}/eventcounters/{numOfDays}")
+	@GetMapping("/{busName}/{locnNbr}/{numOfDays}")
 	public ResponseEntity getByDays(@PathVariable("busName") String busName, @PathVariable("locnNbr") Integer locnNbr,
 			@PathVariable("numOfDays") Integer numOfDays) throws IOException {
 		try {
